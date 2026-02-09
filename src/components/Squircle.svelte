@@ -2,30 +2,21 @@
 	import { getSquirclePath } from "../core/math";
 
 	interface Props {
-		// Wir erlauben number UND string, damit man radius={20} oder radius="20" schreiben kann
 		radius?: number | string;
-		smooth?: number;
+		smooth?: number | string;
 		class?: string;
 		style?: string;
 		children?: import("svelte").Snippet;
 	}
 
-	let {
-		radius = 20, // Standard als Zahl
-		smooth = 0.6,
-		class: className = "",
-		style = "",
-		children,
-	}: Props = $props();
+	let { radius = 20, smooth = 0.6, class: className = "", style = "", children }: Props = $props();
 
 	// State für Dimensionen
 	let w = $state(0);
 	let h = $state(0);
 
-	// Unique ID für SVG Isolation
 	const clipId = `sq-${Math.random().toString(36).substring(2, 9)}`;
 
-	// Der Resize Observer als Action
 	function resizeObserver(node: HTMLElement) {
 		const ro = new ResizeObserver((entries) => {
 			for (const entry of entries) {
@@ -37,7 +28,6 @@
 			}
 		});
 		ro.observe(node);
-
 		return {
 			destroy() {
 				ro.disconnect();
@@ -45,13 +35,12 @@
 		};
 	}
 
-	// Pfad berechnen
 	let pathData = $derived(
 		getSquirclePath({
 			width: w,
 			height: h,
 			radius: radius === "max" ? "max" : parseFloat(radius.toString()),
-			smoothness: smooth,
+			smoothness: parseFloat(smooth.toString()),
 		})
 	);
 </script>
