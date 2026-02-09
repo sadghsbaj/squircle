@@ -11,7 +11,6 @@
 
 	let { radius = 20, smooth = 0.6, class: className = "", style = "", children }: Props = $props();
 
-	// State für Dimensionen
 	let w = $state(0);
 	let h = $state(0);
 
@@ -45,18 +44,18 @@
 	);
 </script>
 
-<div
-	use:resizeObserver
-	class="inline-flex relative box-border w-fit h-fit min-w-0 min-h-0 {className}"
-	style="clip-path: url(#{clipId}); will-change: clip-path; {style}"
->
-	{@render children?.()}
-</div>
+<div use:resizeObserver class="inline-flex relative box-border w-fit h-fit min-w-0 min-h-0 {className}" {style}>
+	<div
+		style="clip-path: url(#{clipId}); will-change: clip-path; width: 100%; height: 100%; display: flex; flex-direction: column;"
+	>
+		{@render children?.()}
+	</div>
 
-<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; pointer-events: none;">
-	<defs>
-		<clipPath id={clipId}>
-			<path d={pathData}></path>
-		</clipPath>
-	</defs>
-</svg>
+	<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; pointer-events: none;">
+		<defs>
+			<clipPath id={clipId}>
+				<path d={pathData}></path>
+			</clipPath>
+		</defs>
+	</svg>
+</div>
