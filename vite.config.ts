@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
 import dts from "vite-plugin-dts";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -17,15 +18,19 @@ export default defineConfig({
 			fileName: "squircle-lib",
 		},
 		rollupOptions: {
-			external: [/^lit/],
-
+			external: [/^lit/, /^svelte/],
 			output: {
 				globals: {
 					lit: "Lit",
-					"lit/decorators.js": "LitDecorators",
+					svelte: "Svelte",
 				},
 			},
 		},
 	},
-	plugins: [dts({ rollupTypes: true })],
+	plugins: [
+		svelte({
+			compilerOptions: { runes: true },
+		}),
+		dts({ rollupTypes: true }),
+	],
 });

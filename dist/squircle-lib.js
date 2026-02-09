@@ -1,12 +1,12 @@
 import { css as f, LitElement as g, html as p } from "lit";
 import { property as d, state as u, customElement as $ } from "lit/decorators.js";
-function _(r) {
-  const { width: i, height: e, radius: o, smoothness: s } = r;
+function _(s) {
+  const { width: i, height: e, radius: o, smoothness: r } = s;
   if (i === 0 || e === 0) return "";
   const l = Math.min(i, e) / 2;
   let t = 0;
   o === "max" ? t = l : t = Math.min(Number(o) || 0, l), t < 0 && (t = 0);
-  const c = 0.5522847498, m = c + s * (1 - c), n = t * m;
+  const c = 0.5522847498, m = c + r * (1 - c), n = t * m;
   return `
     M ${t}, 0
     L ${i - t}, 0
@@ -20,10 +20,10 @@ function _(r) {
     Z
   `;
 }
-var v = Object.defineProperty, b = Object.getOwnPropertyDescriptor, a = (r, i, e, o) => {
-  for (var s = o > 1 ? void 0 : o ? b(i, e) : i, l = r.length - 1, t; l >= 0; l--)
-    (t = r[l]) && (s = (o ? t(i, e, s) : t(s)) || s);
-  return o && s && v(i, e, s), s;
+var v = Object.defineProperty, b = Object.getOwnPropertyDescriptor, a = (s, i, e, o) => {
+  for (var r = o > 1 ? void 0 : o ? b(i, e) : i, l = s.length - 1, t; l >= 0; l--)
+    (t = s[l]) && (r = (o ? t(i, e, r) : t(r)) || r);
+  return o && r && v(i, e, r), r;
 };
 let h = class extends g {
   constructor() {
@@ -32,8 +32,8 @@ let h = class extends g {
   // --- Lifecycle Methods ---
   connectedCallback() {
     super.connectedCallback(), requestAnimationFrame(() => {
-      this._resizeObserver = new ResizeObserver((r) => {
-        for (const i of r) {
+      this._resizeObserver = new ResizeObserver((s) => {
+        for (const i of s) {
           const e = i.contentRect;
           (e.width !== this._width || e.height !== this._height) && (this._width = e.width, this._height = e.height);
         }
@@ -41,13 +41,14 @@ let h = class extends g {
     });
   }
   disconnectedCallback() {
-    super.disconnectedCallback(), this._resizeObserver?.disconnect();
+    var s;
+    super.disconnectedCallback(), (s = this._resizeObserver) == null || s.disconnect();
   }
   // --- Rendering ---
   render() {
     if (this._width === 0 || this._height === 0)
       return p`<div class="clipper"><slot></slot></div>`;
-    const r = _({
+    const s = _({
       width: this._width,
       height: this._height,
       radius: this.radius === "max" ? "max" : parseFloat(this.radius),
@@ -61,7 +62,7 @@ let h = class extends g {
 			<svg aria-hidden="true">
 				<defs>
 					<clipPath id="${this._clipId}">
-						<path d="${r}"></path>
+						<path d="${s}"></path>
 					</clipPath>
 				</defs>
 			</svg>

@@ -37,3 +37,11 @@ export declare type SquircleParams = {
 };
 
 export { }
+
+
+declare global {
+    interface HTMLElementTagNameMap {
+        "squircle-container": SquircleContainer;
+    }
+}
+
