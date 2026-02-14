@@ -14,11 +14,18 @@
 	let w = $state(0);
 	let h = $state(0);
 
+	// Eindeutige ID generieren
 	const clipId = `sq-${Math.random().toString(36).substring(2, 9)}`;
 
 	function resizeObserver(node: HTMLElement) {
+		// 1. SOFORT MESSEN (Wichtig für Initial-Render in Prod)
+		// Wir nehmen offsetWidth/Height für den Startwert, falls der Observer zu langsam ist.
+		w = node.offsetWidth;
+		h = node.offsetHeight;
+
 		const ro = new ResizeObserver((entries) => {
 			for (const entry of entries) {
+				// Nutzung von contentRect ist präziser für SVG-Inhalte
 				const rect = entry.contentRect;
 				if (rect.width !== w || rect.height !== h) {
 					w = rect.width;
@@ -26,7 +33,9 @@
 				}
 			}
 		});
+
 		ro.observe(node);
+
 		return {
 			destroy() {
 				ro.disconnect();
@@ -44,7 +53,7 @@
 	);
 </script>
 
-<div use:resizeObserver class="inline-flex relative box-border w-fit h-fit min-w-0 min-h-0 {className}" {style}>
+<div use:resizeObserver class="relative box-border min-w-0 min-h-0 {className}" {style}>
 	<div
 		style="clip-path: url(#{clipId}); will-change: clip-path; width: 100%; height: 100%; display: flex; flex-direction: column;"
 	>
