@@ -38,9 +38,12 @@ export class SquircleContainer extends LitElement {
 			position: relative;
 			box-sizing: border-box;
 
-			/* Default behavior: adapt to content size */
-			width: fit-content;
-			height: fit-content;
+			/* * UPDATE: Removed 'width: fit-content' and 'height: fit-content'.
+             * This prevents conflicts with external CSS frameworks (like UnoCSS/Tailwind)
+             * and ensures classes like 'w-full' or 'w-1/2' work immediately.
+             */
+			min-width: 0;
+			min-height: 0;
 		}
 
 		.clipper {
@@ -48,6 +51,8 @@ export class SquircleContainer extends LitElement {
 			flex: 1;
 			display: flex;
 			flex-direction: column;
+			width: 100%; /* Ensure it fills the host */
+			height: 100%; /* Ensure it fills the host */
 
 			/* Performance optimization for frequent geometry changes */
 			will-change: clip-path;
@@ -71,21 +76,24 @@ export class SquircleContainer extends LitElement {
 	connectedCallback() {
 		super.connectedCallback();
 
-		// Defer observation to the next animation frame to prevent layout thrashing
-		// during initial rendering.
-		requestAnimationFrame(() => {
-			this._resizeObserver = new ResizeObserver((entries) => {
-				for (const entry of entries) {
-					const rect = entry.contentRect;
-					// Only update state if dimensions actually changed
-					if (rect.width !== this._width || rect.height !== this._height) {
-						this._width = rect.width;
-						this._height = rect.height;
-					}
+		// 1. MEASURE IMMEDIATELY
+		// Just like in Svelte, we grab the size right away to avoid the empty render flash.
+		this._width = this.offsetWidth;
+		this._height = this.offsetHeight;
+
+		// 2. Start Observer (removed requestAnimationFrame for faster reaction)
+		this._resizeObserver = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const rect = entry.contentRect;
+				// Only update state if dimensions actually changed
+				if (rect.width !== this._width || rect.height !== this._height) {
+					this._width = rect.width;
+					this._height = rect.height;
 				}
-			});
-			this._resizeObserver.observe(this);
+			}
 		});
+
+		this._resizeObserver.observe(this);
 	}
 
 	disconnectedCallback() {
@@ -96,22 +104,27 @@ export class SquircleContainer extends LitElement {
 	// --- Rendering ---
 
 	render() {
-		// Prevent rendering the clip-path if dimensions are not yet determined.
-		// This avoids visual artifacts or console errors during initialization.
-		if (this._width === 0 || this._height === 0) {
-			return html`<div class="clipper"><slot></slot></div>`;
-		}
+		// Fallback: render content without clip if size is 0 (prevents invisibility)
+		// OR render clip immediately if we have the size from connectedCallback
 
-		const pathData = getSquirclePath({
-			width: this._width,
-			height: this._height,
-			radius: this.radius === "max" ? "max" : parseFloat(this.radius),
-			smoothness: this.smooth,
-		});
+		// Calculate path
+		const pathData =
+			this._width === 0 || this._height === 0
+				? ""
+				: getSquirclePath({
+						width: this._width,
+						height: this._height,
+						radius: this.radius === "max" ? "max" : parseFloat(this.radius),
+						smoothness: this.smooth,
+				  });
 
-		// We apply the clip-path via inline styles to reference the unique ID reliably.
+		// If pathData is empty, we just render the content in the div,
+		// but 'clip-path' with empty url might hide it depending on browser.
+		// Better to check:
+		const clipStyle = pathData ? `clip-path: url(#${this._clipId});` : "";
+
 		return html`
-			<div class="clipper" style="clip-path: url(#${this._clipId});">
+			<div class="clipper" style="${clipStyle}">
 				<slot></slot>
 			</div>
 

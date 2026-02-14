@@ -1,27 +1,27 @@
-(function(i,o){typeof exports=="object"&&typeof module<"u"?o(exports,require("lit"),require("lit/decorators.js")):typeof define=="function"&&define.amd?define(["exports","lit","lit/decorators.js"],o):(i=typeof globalThis<"u"?globalThis:i||self,o(i.SquircleLib={},i.Lit,i.decorators_js))})(this,function(i,o,c){"use strict";function u(d){const{width:t,height:n,radius:s,smoothness:r}=d;if(t===0||n===0)return"";const l=Math.min(t,n)/2;let e=0;s==="max"?e=l:e=Math.min(Number(s)||0,l),e<0&&(e=0);const p=.5522847498,g=p+r*(1-p),h=e*g;return`
-    M ${e}, 0
-    L ${t-e}, 0
-    C ${t-e+h}, 0, ${t}, ${e-h}, ${t}, ${e}
-    L ${t}, ${n-e}
-    C ${t}, ${n-e+h}, ${t-e+h}, ${n}, ${t-e}, ${n}
-    L ${e}, ${n}
-    C ${e-h}, ${n}, 0, ${n-e+h}, 0, ${n-e}
-    L 0, ${e}
-    C 0, ${e-h}, ${e-h}, 0, ${e}, 0
+(function(s,o){typeof exports=="object"&&typeof module<"u"?o(exports,require("lit"),require("lit/decorators.js")):typeof define=="function"&&define.amd?define(["exports","lit","lit/decorators.js"],o):(s=typeof globalThis<"u"?globalThis:s||self,o(s.SquircleLib={},s.Lit,s.decorators_js))})(this,function(s,o,c){"use strict";function u(d){const{width:e,height:i,radius:n,smoothness:h}=d;if(e===0||i===0)return"";const l=Math.min(e,i)/2;let t=0;n==="max"?t=l:t=Math.min(Number(n)||0,l),t<0&&(t=0);const p=.5522847498,g=p+h*(1-p),r=t*g;return`
+    M ${t}, 0
+    L ${e-t}, 0
+    C ${e-t+r}, 0, ${e}, ${t-r}, ${e}, ${t}
+    L ${e}, ${i-t}
+    C ${e}, ${i-t+r}, ${e-t+r}, ${i}, ${e-t}, ${i}
+    L ${t}, ${i}
+    C ${t-r}, ${i}, 0, ${i-t+r}, 0, ${i-t}
+    L 0, ${t}
+    C 0, ${t-r}, ${t-r}, 0, ${t}, 0
     Z
-  `}var f=Object.defineProperty,m=Object.getOwnPropertyDescriptor,a=(d,t,n,s)=>{for(var r=s>1?void 0:s?m(t,n):t,l=d.length-1,e;l>=0;l--)(e=d[l])&&(r=(s?e(t,n,r):e(r))||r);return s&&r&&f(t,n,r),r};i.SquircleContainer=class extends o.LitElement{constructor(){super(...arguments),this.radius="20",this.smooth=.6,this._width=0,this._height=0,this._clipId=`sq-${Math.random().toString(36).substring(2,9)}`,this._resizeObserver=null}connectedCallback(){super.connectedCallback(),requestAnimationFrame(()=>{this._resizeObserver=new ResizeObserver(t=>{for(const n of t){const s=n.contentRect;(s.width!==this._width||s.height!==this._height)&&(this._width=s.width,this._height=s.height)}}),this._resizeObserver.observe(this)})}disconnectedCallback(){var t;super.disconnectedCallback(),(t=this._resizeObserver)==null||t.disconnect()}render(){if(this._width===0||this._height===0)return o.html`<div class="clipper"><slot></slot></div>`;const t=u({width:this._width,height:this._height,radius:this.radius==="max"?"max":parseFloat(this.radius),smoothness:this.smooth});return o.html`
-			<div class="clipper" style="clip-path: url(#${this._clipId});">
+  `}var f=Object.defineProperty,m=Object.getOwnPropertyDescriptor,a=(d,e,i,n)=>{for(var h=n>1?void 0:n?m(e,i):e,l=d.length-1,t;l>=0;l--)(t=d[l])&&(h=(n?t(e,i,h):t(h))||h);return n&&h&&f(e,i,h),h};s.SquircleContainer=class extends o.LitElement{constructor(){super(...arguments),this.radius="20",this.smooth=.6,this._width=0,this._height=0,this._clipId=`sq-${Math.random().toString(36).substring(2,9)}`,this._resizeObserver=null}connectedCallback(){super.connectedCallback(),this._width=this.offsetWidth,this._height=this.offsetHeight,this._resizeObserver=new ResizeObserver(e=>{for(const i of e){const n=i.contentRect;(n.width!==this._width||n.height!==this._height)&&(this._width=n.width,this._height=n.height)}}),this._resizeObserver.observe(this)}disconnectedCallback(){var e;super.disconnectedCallback(),(e=this._resizeObserver)==null||e.disconnect()}render(){const e=this._width===0||this._height===0?"":u({width:this._width,height:this._height,radius:this.radius==="max"?"max":parseFloat(this.radius),smoothness:this.smooth}),i=e?`clip-path: url(#${this._clipId});`:"";return o.html`
+			<div class="clipper" style="${i}">
 				<slot></slot>
 			</div>
 
 			<svg aria-hidden="true">
 				<defs>
 					<clipPath id="${this._clipId}">
-						<path d="${t}"></path>
+						<path d="${e}"></path>
 					</clipPath>
 				</defs>
 			</svg>
-		`}},i.SquircleContainer.styles=o.css`
+		`}},s.SquircleContainer.styles=o.css`
 		:host {
 			/* inline-flex allows the host to wrap tightly around content */
 			display: inline-flex;
@@ -29,9 +29,12 @@
 			position: relative;
 			box-sizing: border-box;
 
-			/* Default behavior: adapt to content size */
-			width: fit-content;
-			height: fit-content;
+			/* * UPDATE: Removed 'width: fit-content' and 'height: fit-content'.
+             * This prevents conflicts with external CSS frameworks (like UnoCSS/Tailwind)
+             * and ensures classes like 'w-full' or 'w-1/2' work immediately.
+             */
+			min-width: 0;
+			min-height: 0;
 		}
 
 		.clipper {
@@ -39,6 +42,8 @@
 			flex: 1;
 			display: flex;
 			flex-direction: column;
+			width: 100%; /* Ensure it fills the host */
+			height: 100%; /* Ensure it fills the host */
 
 			/* Performance optimization for frequent geometry changes */
 			will-change: clip-path;
@@ -55,4 +60,4 @@
 			height: 0;
 			pointer-events: none;
 		}
-	`,a([c.property({type:String})],i.SquircleContainer.prototype,"radius",2),a([c.property({type:Number})],i.SquircleContainer.prototype,"smooth",2),a([c.state()],i.SquircleContainer.prototype,"_width",2),a([c.state()],i.SquircleContainer.prototype,"_height",2),i.SquircleContainer=a([c.customElement("squircle-container")],i.SquircleContainer),i.getSquirclePath=u,Object.defineProperty(i,Symbol.toStringTag,{value:"Module"})});
+	`,a([c.property({type:String})],s.SquircleContainer.prototype,"radius",2),a([c.property({type:Number})],s.SquircleContainer.prototype,"smooth",2),a([c.state()],s.SquircleContainer.prototype,"_width",2),a([c.state()],s.SquircleContainer.prototype,"_height",2),s.SquircleContainer=a([c.customElement("squircle-container")],s.SquircleContainer),s.getSquirclePath=u,Object.defineProperty(s,Symbol.toStringTag,{value:"Module"})});
